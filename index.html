@@ -95,7 +95,7 @@
             maxCell.innerHTML = `0`;
             maxCell.id = `maxRow${rowCount}`;
 
-            for (let i = 2; i <= columnCount; i++) {
+            for (let i = 2; i < columnCount; i++) {
                 const cell = newRow.insertCell(i);
                 cell.contentEditable = "true";
                 cell.innerHTML = '0';
