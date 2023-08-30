@@ -1,0 +1,39 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background: linear-gradient(to bottom right, #ffffff, #f3f3f3);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th,
+td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: center;
+}
+
+th,
+td {
+    background-color: #f2f2f2;
+}
+
+.editable {
+    cursor: pointer;
+}
+
+.btn-container {
+    margin-top: 20px;
+}
+
+.delete {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: red;
+    font-size: 11px;
+}
