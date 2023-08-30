@@ -139,30 +139,6 @@
             }
         }
 
-        function deleteRow() {
-            const table = document.getElementById('assessmentTable').getElementsByTagName('tbody')[0];
-            if (rowCount > 1) {
-                table.deleteRow(-1);
-                rowCount--;
-            }
-        }
-
-        function deleteColumn() {
-            const table = document.getElementById('assessmentTable');
-            if (columnCount > 2) {
-                const headerRow = table.getElementsByTagName('thead')[0].getElementsByTagName('tr')[0];
-                headerRow.deleteCell(-1);
-
-                const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-                for (let i = 0; i < rows.length; i++) {
-                    rows[i].deleteCell(-1);
-                    updateMaxValue(rows[i]);
-                }
-
-                columnCount--;
-            }
-        }
-
         function updateMaxValue(row) {
             const cells = row.getElementsByTagName('td');
             let maxVal = Number.NEGATIVE_INFINITY;
