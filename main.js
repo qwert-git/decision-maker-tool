@@ -1,41 +1,53 @@
 
-let columnCount = 2;
+const reservedColumnsCount = 2;
+
+let columnCount = reservedColumnsCount;
 let rowCount = 0;
 
+function createOptionCell() {
+    var cell = $('<td>')
+        .attr('contenteditable', 'true')
+        .text('0')
+        .on('input', function () {
+            updateMaxValue(row);
+        });
+
+    return cell;
+}
+
+function createCriteriaCell()
+{
+    const criteriaSpan = $('<span>').addClass('editable').attr('contenteditable', 'true').text(`Criteria ${rowCount}`);
+    const deleteButton = $('<button>').addClass('delete delete-row').text('✕').click(deleteSpecificRow);
+
+    const criteriaCell = $('<td>');
+    criteriaCell.append(criteriaSpan);
+    criteriaCell.append(deleteButton);
+
+    return criteriaCell;
+}
+
+// Main function to add a row
 function addRow() {
-    const table = document.getElementById('assessmentTable').getElementsByTagName('tbody')[0];
-    const newRow = table.insertRow(-1);
     rowCount++;
 
-    const criteriaCell = newRow.insertCell(0);
-    const criteriaSpan = document.createElement('span');
-    criteriaSpan.innerHTML = `Criteria ${rowCount}`;
-    criteriaSpan.className = "editable";
-    criteriaSpan.contentEditable = "true";
-    criteriaCell.appendChild(criteriaSpan);
+    const criteriaCell = createCriteriaCell();
+    const maxCell = $('<td>').attr('id', `maxRow${rowCount}`).text('0');
 
-    const deleteButton = document.createElement('button');
-    deleteButton.className = 'delete delete-row';
-    deleteButton.textContent = '✕';
-    deleteButton.addEventListener('click', deleteSpecificRow);
-    criteriaCell.appendChild(deleteButton);
+    const newRow = $('<tr>');
+    newRow.append(criteriaCell);
+    newRow.append(maxCell);
 
-    const maxCell = newRow.insertCell(1);
-    maxCell.innerHTML = `0`;
-    maxCell.id = `maxRow${rowCount}`;
-
-    for (let i = 2; i < columnCount; i++) {
-        const cell = newRow.insertCell(i);
-        cell.contentEditable = "true";
-        cell.innerHTML = '0';
-
-        cell.addEventListener('input', function () {
-            updateMaxValue(newRow);
-        });
+    for (let i = reservedColumnsCount; i < columnCount; i++) {
+        const cell = createOptionCell();
+        newRow.append(cell);
     }
 
-    newRow.id = rowCount;
+    newRow.attr('id', rowCount);
+
+    $('#assessmentTable tbody').append(newRow);
 }
+
 
 function addColumn() {
     const table = document.getElementById('assessmentTable');
