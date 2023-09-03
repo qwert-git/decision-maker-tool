@@ -9,13 +9,15 @@ function addRow() {
     rowCount++;
 
     const criteriaCell = createCriteriaCell();
-    const weightCell = $('<td>');
-    weightCell.append(createEditableSpan('1'));
     const maxCell = $('<td>').attr('id', `maxRow${rowCount}`).text('0');
 
     const newRow = $('<tr>').attr('id', rowCount);
     newRow.append(criteriaCell);
+
+    const weightCell = $('<td>');
+    weightCell.append(createEditableSpan('1').on('input', function() { updateCoef(newRow); }));
     newRow.append(weightCell);
+
     newRow.append(maxCell);
 
     for (let i = reservedColumnsCount; i < columnCount; i++) {
@@ -28,14 +30,14 @@ function addRow() {
 
 // Main function to add a column
 function addColumn() {
-    columnCount++;
-
     addOptionHeader();
 
     const rows = $('#assessmentTable tbody tr');
-    rows.each(function() {
+    rows.each(function () {
         const cell = createOptionCell($(this));
         $(this).append(cell);
+        const coefCell = $('<td>').attr('id', `coefCol${columnCount}`).text('0');
+        $(this).append(coefCell);
     });
 }
 
@@ -44,7 +46,7 @@ function addOptionHeader() {
     const headerRow = $('#assessmentTable thead tr');
 
     const newHeaderSpan = createEditableSpan(`New Option`);
-        
+
     const deleteButton = $('<button>')
         .addClass('delete delete-column')
         .text('✕')
@@ -55,6 +57,11 @@ function addOptionHeader() {
         .append(deleteButton);
 
     headerRow.append(newHeaderCell);
+    columnCount++;
+
+    const coefHeaderCell = $('<th>').text('Coef');
+    headerRow.append(coefHeaderCell);
+    columnCount++;
 }
 
 function createOptionCell(row) {
@@ -72,8 +79,7 @@ function createEditableSpan(text) {
     return $('<span>').addClass('editable').attr('contenteditable', 'true').text(text);
 }
 
-function createCriteriaCell()
-{
+function createCriteriaCell() {
     const criteriaSpan = createEditableSpan(`Criteria ${rowCount}`);
     const deleteButton = $('<button>').addClass('delete delete-row').text('✕').click(deleteSpecificRow);
 
@@ -86,9 +92,9 @@ function createCriteriaCell()
 
 function updateMaxValue(row) {
     let maxVal = Number.NEGATIVE_INFINITY;
-    
+
     // Iterate through cells starting from index 3
-    row.find('td:gt(2)').each(function() {
+    row.find('td:gt(2)').each(function () {
         const val = parseFloat($(this).text());
         if (!isNaN(val) && val > maxVal) {
             maxVal = val;
@@ -103,6 +109,23 @@ function updateMaxValue(row) {
     } else {
         maxCell.text(maxVal);
     }
+
+    updateCoef(row);
+}
+
+function updateCoef(row)
+{
+    const rowWeight = parseFloat(row.find('td:eq(1)').text()); // Assuming the Weight column is the second column
+    const maxCell = row.find('td').eq(2);
+
+    row.find('td:gt(2)').each(function (index, element) {
+        if (index % 2 === 0) { // Assuming every second cell after the first two is an option cell
+            const optionValue = parseFloat($(element).text());
+            const coefCell = $(element).next(); // The Coef cell is immediately after the option cell
+            const coefValue = (optionValue / maxCell.text()) * rowWeight;
+            coefCell.text(isNaN(coefValue) ? '0' : coefValue.toFixed(2));
+        }
+    });
 }
 
 function deleteSpecificRow(event) {
@@ -118,10 +141,11 @@ function deleteSpecificColumn(event) {
     if (cell.length) {
         const index = cell.index();
         const table = $('#assessmentTable');
-        
+
         columnCount--;
 
-        table.find('tr').each(function() {
+        table.find('tr').each(function () {
+            $(this).find('td, th').eq(index + 1).remove();
             $(this).find('td, th').eq(index).remove();
             updateMaxValue($(this));
         });
