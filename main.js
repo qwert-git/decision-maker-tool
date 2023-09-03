@@ -82,48 +82,45 @@ function createCriteriaCell()
 }
 
 function updateMaxValue(row) {
-    const cells = row.getElementsByTagName('td');
     let maxVal = Number.NEGATIVE_INFINITY;
-
-    for (let i = 2; i < cells.length; i++) {
-        console.log(cells[i].innerText)
-        const val = parseFloat(cells[i].innerText);
+    
+    // Iterate through cells starting from index 2
+    row.find('td:gt(1)').each(function() {
+        const val = parseFloat($(this).text());
         if (!isNaN(val) && val > maxVal) {
             maxVal = val;
         }
-    }
+    });
 
-    console.log(row);
-    const maxCell = row.getElementsByTagName(`td`)[1];
-    console.log(maxCell);
-    console.log(maxVal)
+    // Update the max value in the second cell (index 1) of the row
+    const maxCell = row.find('td').eq(1);
+
     if (maxVal === Number.NEGATIVE_INFINITY) {
-        maxCell.innerText = '0';
+        maxCell.text('0');
     } else {
-        maxCell.innerText = maxVal;
+        maxCell.text(maxVal);
     }
 }
 
 function deleteSpecificRow(event) {
-    const row = event.target.closest('tr');
-    if (row) {
+    const row = $(event.target).closest('tr');
+    if (row.length) {
         row.remove();
         rowCount--;
     }
 }
 
 function deleteSpecificColumn(event) {
-    const cell = event.target.closest('th');
-    if (cell) {
-        const index = cell.cellIndex;
-        const table = document.getElementById('assessmentTable');
-        const rows = table.rows;
-
+    const cell = $(event.target).closest('th');
+    if (cell.length) {
+        const index = cell.index();
+        const table = $('#assessmentTable');
+        
         columnCount--;
-        for (let i = 0; i < rows.length; i++) {
-            rows[i].deleteCell(index);
-            if (i > 0)
-                updateMaxValue(rows[i]);
-        }
+
+        table.find('tr').each(function() {
+            $(this).find('td, th').eq(index).remove();
+            updateMaxValue($(this));
+        });
     }
 }
