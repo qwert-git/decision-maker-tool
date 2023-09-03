@@ -1,5 +1,5 @@
 
-const reservedColumnsCount = 2;
+const reservedColumnsCount = 3;
 
 let columnCount = reservedColumnsCount;
 let rowCount = 0;
@@ -9,10 +9,13 @@ function addRow() {
     rowCount++;
 
     const criteriaCell = createCriteriaCell();
+    const weightCell = $('<td>');
+    weightCell.append(createEditableSpan('1'));
     const maxCell = $('<td>').attr('id', `maxRow${rowCount}`).text('0');
 
-    const newRow = $('<tr>').attr('id', rowCount);;
+    const newRow = $('<tr>').attr('id', rowCount);
     newRow.append(criteriaCell);
+    newRow.append(weightCell);
     newRow.append(maxCell);
 
     for (let i = reservedColumnsCount; i < columnCount; i++) {
@@ -40,7 +43,7 @@ function addColumn() {
 function addOptionHeader() {
     const headerRow = $('#assessmentTable thead tr');
 
-    const newHeaderSpan = createEditableCell(`New Option`);
+    const newHeaderSpan = createEditableSpan(`New Option`);
         
     const deleteButton = $('<button>')
         .addClass('delete delete-column')
@@ -65,13 +68,13 @@ function createOptionCell(row) {
     return cell;
 }
 
-function createEditableCell(text) {
+function createEditableSpan(text) {
     return $('<span>').addClass('editable').attr('contenteditable', 'true').text(text);
 }
 
 function createCriteriaCell()
 {
-    const criteriaSpan = createEditableCell(`Criteria ${rowCount}`);
+    const criteriaSpan = createEditableSpan(`Criteria ${rowCount}`);
     const deleteButton = $('<button>').addClass('delete delete-row').text('✕').click(deleteSpecificRow);
 
     const criteriaCell = $('<td>');
@@ -84,8 +87,8 @@ function createCriteriaCell()
 function updateMaxValue(row) {
     let maxVal = Number.NEGATIVE_INFINITY;
     
-    // Iterate through cells starting from index 2
-    row.find('td:gt(1)').each(function() {
+    // Iterate through cells starting from index 3
+    row.find('td:gt(2)').each(function() {
         const val = parseFloat($(this).text());
         if (!isNaN(val) && val > maxVal) {
             maxVal = val;
@@ -93,7 +96,7 @@ function updateMaxValue(row) {
     });
 
     // Update the max value in the second cell (index 1) of the row
-    const maxCell = row.find('td').eq(1);
+    const maxCell = row.find('td').eq(2);
 
     if (maxVal === Number.NEGATIVE_INFINITY) {
         maxCell.text('0');
