@@ -4,7 +4,57 @@ const reservedColumnsCount = 2;
 let columnCount = reservedColumnsCount;
 let rowCount = 0;
 
-function createOptionCell() {
+// Main function to add a row
+function addRow() {
+    rowCount++;
+
+    const criteriaCell = createCriteriaCell();
+    const maxCell = $('<td>').attr('id', `maxRow${rowCount}`).text('0');
+
+    const newRow = $('<tr>').attr('id', rowCount);;
+    newRow.append(criteriaCell);
+    newRow.append(maxCell);
+
+    for (let i = reservedColumnsCount; i < columnCount; i++) {
+        const cell = createOptionCell(newRow);
+        newRow.append(cell);
+    }
+
+    $('#assessmentTable tbody').append(newRow);
+}
+
+// Main function to add a column
+function addColumn() {
+    columnCount++;
+
+    addOptionHeader();
+
+    const rows = $('#assessmentTable tbody tr');
+    rows.each(function() {
+        const cell = createOptionCell($(this));
+        $(this).append(cell);
+    });
+}
+
+// Function to create header cell with delete button
+function addOptionHeader() {
+    const headerRow = $('#assessmentTable thead tr');
+
+    const newHeaderSpan = createEditableCell(`New Option`);
+        
+    const deleteButton = $('<button>')
+        .addClass('delete delete-column')
+        .text('✕')
+        .click(deleteSpecificColumn);
+
+    const newHeaderCell = $('<th>')
+        .append(newHeaderSpan)
+        .append(deleteButton);
+
+    headerRow.append(newHeaderCell);
+}
+
+function createOptionCell(row) {
     var cell = $('<td>')
         .attr('contenteditable', 'true')
         .text('0')
@@ -15,9 +65,13 @@ function createOptionCell() {
     return cell;
 }
 
+function createEditableCell(text) {
+    return $('<span>').addClass('editable').attr('contenteditable', 'true').text(text);
+}
+
 function createCriteriaCell()
 {
-    const criteriaSpan = $('<span>').addClass('editable').attr('contenteditable', 'true').text(`Criteria ${rowCount}`);
+    const criteriaSpan = createEditableCell(`Criteria ${rowCount}`);
     const deleteButton = $('<button>').addClass('delete delete-row').text('✕').click(deleteSpecificRow);
 
     const criteriaCell = $('<td>');
@@ -25,59 +79,6 @@ function createCriteriaCell()
     criteriaCell.append(deleteButton);
 
     return criteriaCell;
-}
-
-// Main function to add a row
-function addRow() {
-    rowCount++;
-
-    const criteriaCell = createCriteriaCell();
-    const maxCell = $('<td>').attr('id', `maxRow${rowCount}`).text('0');
-
-    const newRow = $('<tr>');
-    newRow.append(criteriaCell);
-    newRow.append(maxCell);
-
-    for (let i = reservedColumnsCount; i < columnCount; i++) {
-        const cell = createOptionCell();
-        newRow.append(cell);
-    }
-
-    newRow.attr('id', rowCount);
-
-    $('#assessmentTable tbody').append(newRow);
-}
-
-
-function addColumn() {
-    const table = document.getElementById('assessmentTable');
-    const headerRow = table.getElementsByTagName('thead')[0].getElementsByTagName('tr')[0];
-    columnCount++;
-    const newHeaderCell = document.createElement("th");
-
-    const newHeaderSpan = document.createElement("span");
-    newHeaderSpan.innerHTML = `Option ${columnCount - 2}`;
-    newHeaderSpan.className = "editable";
-    newHeaderSpan.contentEditable = "true";
-    newHeaderCell.appendChild(newHeaderSpan);
-
-    const deleteButton = document.createElement('button');
-    deleteButton.className = 'delete delete-column';
-    deleteButton.textContent = '✕';
-    deleteButton.addEventListener('click', deleteSpecificColumn);
-    newHeaderCell.appendChild(deleteButton);
-
-    headerRow.appendChild(newHeaderCell);
-
-    const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-    for (let i = 0; i < rows.length; i++) {
-        const cell = rows[i].insertCell(-1);
-        cell.contentEditable = "true";
-
-        cell.addEventListener('input', function () {
-            updateMaxValue(rows[i]);
-        });
-    }
 }
 
 function updateMaxValue(row) {
